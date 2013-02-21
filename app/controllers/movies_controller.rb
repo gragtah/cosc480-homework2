@@ -1,14 +1,20 @@
 # in app/controllers/movies_controller.rb
 
 class MoviesController < ApplicationController
+  def self.getUniqueRatings
+    Movie.uniq.pluck(:rating)
+  end
+
   def index
+    @all_ratings = MoviesController.getUniqueRatings
     if params[:sort_by] == "title"
         @title_class = "hilite"
     end
     if params[:sort_by] == "release_date"
         @release_date_class = "hilite"
     end
-    @movies = Movie.all(:order => params[:sort_by])
+    @chosen_ratings = params[:ratings]==nil ? @all_ratings : params[:ratings].keys
+    @movies = Movie.where(:rating => @chosen_ratings).order(params[:sort_by])
   end
 
   def show

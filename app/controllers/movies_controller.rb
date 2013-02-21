@@ -13,8 +13,15 @@ class MoviesController < ApplicationController
     if params[:sort_by] == "release_date"
         @release_date_class = "hilite"
     end
-    @chosen_ratings = params[:ratings]==nil ? @all_ratings : params[:ratings].keys
-    @movies = Movie.where(:rating => @chosen_ratings).order(params[:sort_by])
+    if !session.has_key?(:ratings)
+        @all_ratings.each { |rating| session[:ratings][rating] = 1}
+    end
+    if params[:ratings] == nil
+        return redirect_to movies_path(@movies, {:ratings => session[:ratings], :sort_by => session[:sort_by]})
+    end
+    session[:ratings] = @chosen_ratings = params[:ratings]
+    session[:sort_by] = params[:sort_by]
+    @movies = Movie.where(:rating => @chosen_ratings.keys).order(params[:sort_by])
   end
 
   def show

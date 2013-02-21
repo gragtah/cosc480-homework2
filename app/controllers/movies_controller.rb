@@ -7,7 +7,7 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = MoviesController.getUniqueRatings
-    if params[:sort_by] == "movie_title"
+    if params[:sort_by] == "title"
         @title_class = "hilite"
     end
     if params[:sort_by] == "release_date"

@@ -9,19 +9,23 @@ class MoviesController < ApplicationController
     @all_ratings = MoviesController.getUniqueRatings
     if params[:sort_by] == "title"
         @title_class = "hilite"
-    end
-    if params[:sort_by] == "release_date"
+    elsif params[:sort_by] == "release_date"
         @release_date_class = "hilite"
     end
     if !session.has_key?(:ratings)
         @all_ratings.each { |rating| session[:ratings][rating] = 1}
     end
-    if params[:ratings] == nil
-        return redirect_to movies_path(@movies, {:ratings => session[:ratings], :sort_by => session[:sort_by]})
+    if !params[:ratings] and session[:ratings]
+        flash.keep
+        return redirect_to movies_path(@movies, params.merge({:ratings => session[:ratings]}))
+    end
+    if !params[:sort_by] and session[:sort_by]
+        flash.keep
+        return redirect_to movies_path(@movies, params.merge({:sort_by => session[:sort_by]}))
     end
     session[:ratings] = @chosen_ratings = params[:ratings]
-    session[:sort_by] = params[:sort_by]
-    @movies = Movie.where(:rating => @chosen_ratings.keys).order(params[:sort_by])
+    session[:sort_by] = params[:sort_by] if Movie.column_names.include?(params[:sort_by])
+    @movies = Movie.where(:rating => session[:ratings].keys).order(session[:sort_by])
   end
 
   def show

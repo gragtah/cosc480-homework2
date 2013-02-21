@@ -13,6 +13,7 @@ class MoviesController < ApplicationController
         @release_date_class = "hilite"
     end
     if !session.has_key?(:ratings)
+        session[:ratings] = {}
         @all_ratings.each { |rating| session[:ratings][rating] = 1}
     end
     if !params[:ratings] and session[:ratings]
